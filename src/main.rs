@@ -18,5 +18,6 @@ fn main() {
     let instructions = get_arg_one();
     println!("Got: {}", instructions);
     let jump_map = fuckvm::create_jump_map(instructions.clone());
+    println!("jumps: {:?}", jump_map);
     let vm = fuckvm::VM::new(instructions, jump_map);
 }
