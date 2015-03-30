@@ -75,7 +75,7 @@ fn main() {
                 }
             },
             READ_DATA => {
-                ();
+                println!("Reading data not supported yet");
             },
             OUTPUT_DATA => {
                 print!("{}", data[data_pointer] as char);
