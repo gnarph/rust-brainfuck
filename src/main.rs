@@ -10,14 +10,6 @@ const READ_DATA: char = ',';
 const JUMP_FORWARD: char = '[';
 const JUMP_BACKWARD: char = ']';
 
-pub struct VM {
-    instructions: String,
-    instruction_pointer: usize,
-    data_pointer: usize,
-    data: [u8; 3200],
-    jump_map: HashMap<usize, usize>,
-}
-
 pub fn create_jump_map(instructions: String) -> HashMap<usize, usize>{
     let mut openings: Vec<usize> = Vec::new();
     let mut jump_map: HashMap<usize, usize> = HashMap::new();
@@ -51,12 +43,46 @@ fn get_arg_one() -> String {
 
 fn main() {
     let instructions = get_arg_one();
-    println!("Got: {}", instructions);
-    let mut jump_map = create_jump_map(instructions.clone());
-    println!("jumps: {:?}", jump_map);
-    let mut vm = fuckvm::VM::new(instructions, jump_map);
+    let jump_map = create_jump_map(instructions.clone());
     let mut instruction_pointer = 0;
     let mut data_pointer = 0;
-    let mut data = [u8; 3200];
-    let end = instructions.length();
+    let mut data = [0u8; 3200];
+    let byte_ins = instructions.into_bytes();
+
+    while instruction_pointer < byte_ins.len() {
+        let instruction = byte_ins[instruction_pointer];
+        match instruction as char {
+            INCREMENT_DATA_POINTER => {
+                data_pointer += 1;
+            },
+            DECREMENT_DATA_POINTER => {
+                data_pointer -= 1;
+            },
+            INCREMENT_DATA => {
+                data[data_pointer] += 1;
+            },
+            DECREMENT_DATA => {
+                data[data_pointer] -= 1;
+            },
+            JUMP_FORWARD => {
+                if data[data_pointer] == 0 {
+                    instruction_pointer = jump_map[&instruction_pointer];
+                }
+            },
+            JUMP_BACKWARD => {
+                if data[data_pointer] != 0 {
+                    instruction_pointer = jump_map[&instruction_pointer];
+                }
+            },
+            READ_DATA => {
+                ();
+            },
+            OUTPUT_DATA => {
+                print!("{}", data[data_pointer] as char);
+            },
+            _ => (),
+        }
+        instruction_pointer += 1;
+    }
+    print!("\n");
 }
