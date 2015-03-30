@@ -1,0 +1,9 @@
+[package]
+
+name = "rustfuck"
+version = "0.0.1"
+authors = [ "gordlarson@gmail.com" ]
+
+[[bin]]
+
+name = "rustfuck"
