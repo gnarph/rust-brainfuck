@@ -28,46 +28,109 @@ fn create_jump_map(instructions: &String) -> HashMap<usize, usize>{
     jump_map
 }
 
+struct VM<'a> {
+    jump_map: &'a HashMap<usize, usize>,
+    instruction_pointer: &'a mut usize,
+    data_pointer: &'a mut usize,
+    data: &'a mut [u8; 3200],
+    byte_ins: &'a Vec<u8>,
+}
+
+impl<'a> VM<'a> {
+    pub fn fetch(&self) -> u8 {
+        self.byte_ins[*self.instruction_pointer]
+    }
+
+    pub fn increment_data_pointer(&self) {
+        *self.data_pointer += 1;
+    }
+
+    pub fn decrement_data_pointer(&self) {
+        *self.data_pointer -= 1;
+    }
+
+    fn increment_data(&self) {
+        self.data[*self.data_pointer] += 1;
+    }
+
+    fn decrement_data(&self) {
+        self.data[*self.data_pointer] -= 1;
+    }
+
+    fn increment_instruction_pointer(&self) {
+        *self.instruction_pointer += 1;
+    }
+
+    fn get_data(&self) -> u8 {
+        self.data[*self.data_pointer]
+    }
+
+    fn jump(&self) {
+        let destination = self.jump_map.get(self.instruction_pointer);
+        *self.instruction_pointer = *destination.unwrap();
+    }
+
+    fn jump_forward(&self) {
+        if self.get_data() == 0 {
+            self.jump();
+        }
+    }
+
+    fn jump_backward(&self) {
+        if self.get_data() != 0 {
+            self.jump();
+        }
+    }
+
+        fn done(&self) -> bool {
+        *self.instruction_pointer >= self.byte_ins.len()
+    }
+}
+
 pub fn execute(instructions: String) {
     let jump_map = create_jump_map(&instructions);
-    let mut instruction_pointer = 0;
+    let mut instruction_pointer: usize = 0;
     let mut data_pointer = 0;
     let mut data = [0u8; 3200];
     let byte_ins = instructions.into_bytes();
 
-    while instruction_pointer < byte_ins.len() {
-        let instruction = byte_ins[instruction_pointer];
+    let mut vm = VM {
+        jump_map: &jump_map,
+        instruction_pointer: &mut instruction_pointer,
+        data_pointer: &mut data_pointer,
+        data: &mut data,
+        byte_ins: &byte_ins
+    };
+
+    while !vm.done() {
+        let instruction = vm.fetch();
         match instruction as char {
             INCREMENT_DATA_POINTER => {
-                data_pointer += 1;
+                vm.increment_data_pointer()
             },
             DECREMENT_DATA_POINTER => {
-                data_pointer -= 1;
+                vm.decrement_data_pointer()
             },
             INCREMENT_DATA => {
-                data[data_pointer] += 1;
+                vm.increment_data()
             },
             DECREMENT_DATA => {
-                data[data_pointer] -= 1;
+                vm.decrement_data()
             },
             JUMP_FORWARD => {
-                if data[data_pointer] == 0 {
-                    instruction_pointer = jump_map[&instruction_pointer];
-                }
+                vm.jump_forward()
             },
             JUMP_BACKWARD => {
-                if data[data_pointer] != 0 {
-                    instruction_pointer = jump_map[&instruction_pointer];
-                }
+                vm.jump_backward()
             },
             READ_DATA => {
                 println!("Reading data not supported yet");
             },
             OUTPUT_DATA => {
-                print!("{}", data[data_pointer] as char);
+                print!("{}", vm.get_data() as char);
             },
             _ => (),
         }
-        instruction_pointer += 1;
+        vm.increment_instruction_pointer();
     }
 }
