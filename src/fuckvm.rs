@@ -105,30 +105,16 @@ pub fn execute(instructions: String) {
     while !vm.done() {
         let instruction = vm.fetch();
         match instruction as char {
-            INCREMENT_DATA_POINTER => {
-                vm.increment_data_pointer()
-            },
-            DECREMENT_DATA_POINTER => {
-                vm.decrement_data_pointer()
-            },
-            INCREMENT_DATA => {
-                vm.increment_data()
-            },
-            DECREMENT_DATA => {
-                vm.decrement_data()
-            },
-            JUMP_FORWARD => {
-                vm.jump_forward()
-            },
-            JUMP_BACKWARD => {
-                vm.jump_backward()
-            },
+            INCREMENT_DATA_POINTER => vm.increment_data_pointer(),
+            DECREMENT_DATA_POINTER => vm.decrement_data_pointer(),
+            INCREMENT_DATA => vm.increment_data(),
+            DECREMENT_DATA => vm.decrement_data(),
+            JUMP_FORWARD => vm.jump_forward(),
+            JUMP_BACKWARD => vm.jump_backward(),
             READ_DATA => {
                 println!("Reading data not supported yet");
             },
-            OUTPUT_DATA => {
-                print!("{}", vm.get_data() as char);
-            },
+            OUTPUT_DATA => print!("{}", vm.get_data() as char),
             _ => (),
         }
         vm.increment_instruction_pointer();
