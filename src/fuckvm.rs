@@ -41,23 +41,23 @@ impl<'a> VM<'a> {
         self.byte_ins[*self.instruction_pointer]
     }
 
-    pub fn increment_data_pointer(&self) {
+    pub fn increment_data_pointer(&mut self) {
         *self.data_pointer += 1;
     }
 
-    pub fn decrement_data_pointer(&self) {
+    pub fn decrement_data_pointer(&mut self) {
         *self.data_pointer -= 1;
     }
 
-    fn increment_data(&self) {
+    fn increment_data(&mut self) {
         self.data[*self.data_pointer] += 1;
     }
 
-    fn decrement_data(&self) {
+    fn decrement_data(&mut self) {
         self.data[*self.data_pointer] -= 1;
     }
 
-    fn increment_instruction_pointer(&self) {
+    fn increment_instruction_pointer(&mut self) {
         *self.instruction_pointer += 1;
     }
 
@@ -65,18 +65,18 @@ impl<'a> VM<'a> {
         self.data[*self.data_pointer]
     }
 
-    fn jump(&self) {
+    fn jump(&mut self) {
         let destination = self.jump_map.get(self.instruction_pointer);
         *self.instruction_pointer = *destination.unwrap();
     }
 
-    fn jump_forward(&self) {
+    fn jump_forward(&mut self) {
         if self.get_data() == 0 {
             self.jump();
         }
     }
 
-    fn jump_backward(&self) {
+    fn jump_backward(&mut self) {
         if self.get_data() != 0 {
             self.jump();
         }
